@@ -4,4 +4,4 @@ module RailsAdminClone
 end
 
 require 'rails_admin/config/actions'
-require 'rails_admin_nestable/clone'
+require 'rails_admin_clone/clone'
