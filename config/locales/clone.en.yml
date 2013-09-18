@@ -1,0 +1,11 @@
+
+en:
+  admin:
+    actions:
+      clone:
+        title: "Clone"
+        menu: "Clone for %{model_label} '%{object_label}'"
+        breadcrumb: "Clone"
+        link: "Clone"
+        bulk_link: "Clone selected %{model_label_plural}"
+        done: "Cloneed"
