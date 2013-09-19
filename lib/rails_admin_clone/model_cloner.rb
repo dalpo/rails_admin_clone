@@ -9,8 +9,11 @@ module RailsAdminClone
       @original_model
     end
 
-    def default_clone(deph = nil)
-      self.clone_recursively(self.original_model, deph)
+    def default_clone(depth = nil)
+      @depth = depth
+
+      new_object = self.clone_object(self.original_model)
+      self.clone_recursively(self.original_model, new_object)
     end
 
     def method_clone(method)
@@ -18,13 +21,27 @@ module RailsAdminClone
 
   protected
 
-    def clone_recursively(old_object, deph = nil)
-      new_object = clone_object(old_object)
-      new_object = clone_has_one(old_object, new_object)
-      new_object = clone_has_many(old_object, new_object)
-      new_object = clone_habtm(old_object, new_object)
+    def decrement_depth!
+      @depth-= 1 unless @depth.nil?
+    end
 
-      new_object
+    def depth
+      @depth
+    end
+
+    def go_depth?
+      self.depth.nil? || self.depth > 0
+    end
+
+    def clone_recursively(old_object, new_object)
+      if go_depth?
+
+        new_object = clone_has_one(old_object, new_object)
+        new_object = clone_has_many(old_object, new_object)
+        new_object = clone_habtm(old_object, new_object)
+
+        new_object
+      end
     end
 
     # clone object without associations
@@ -52,8 +69,9 @@ module RailsAdminClone
             ![primary_key, class_association.try(:foreign_key), class_association.try(:type), 'created_at', 'updated_at'].include?(k)
           end
 
-          new_object.send(:"build_#{association_name}").tap do |a|
-            a.assign_attributes attributes, without_protection: true
+          new_object.send(:"build_#{association_name}").tap do |new_association|
+            new_association.assign_attributes attributes, without_protection: true
+            new_association = self.clone_recursively(old_association, new_association)
           end
         end
       end
@@ -73,8 +91,9 @@ module RailsAdminClone
             ![primary_key, class_association.try(:foreign_key), class_association.try(:type), 'created_at', 'updated_at'].include?(k)
           end
 
-          new_object.send(association_name).build.tap do |a|
-            a.assign_attributes attributes, without_protection: true
+          new_object.send(association_name).build.tap do |new_association|
+            new_association.assign_attributes attributes, without_protection: true
+            new_association = self.clone_recursively(old_association, new_association)
           end
         end
       end
