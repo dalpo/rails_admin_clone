@@ -20,7 +20,7 @@ module RailsAdmin
             @object = @abstract_model.new
 
             attributes = @old_object.attributes.select do |k,v|
-              !['id', 'created_at', 'updated_at'].include?(k)
+              ![@object.class.primary_key, 'created_at', 'updated_at'].include?(k)
             end
 
             # clone old_object
@@ -32,8 +32,10 @@ module RailsAdmin
               old_association = @old_object.send(association_name)
 
               if old_association
+                primary_key = association_name.singularize.camelize.constantize.try(:primary_key) || 'id'
+
                 attributes = old_association.attributes.select do |k,v|
-                  !['id', 'created_at', 'updated_at', class_association.try(:foreign_key), class_association.try(:type)].include?(k)
+                  ![primary_key, class_association.try(:foreign_key), class_association.try(:type), 'created_at', 'updated_at'].include?(k)
                 end
 
                 @object.send(:"build_#{association_name}").tap do |a|
@@ -45,10 +47,11 @@ module RailsAdmin
             # clone has_many associations
             @object.class.reflect_on_all_associations(:has_many).each do |class_association|
               association_name = class_association.name
+              primary_key = association_name.singularize.camelize.constantize.try(:primary_key) || 'id'
 
               @old_object.send(association_name).each do |old_association|
                 attributes = old_association.attributes.select do |k,v|
-                  !['id', 'created_at', 'updated_at', class_association.try(:foreign_key), class_association.try(:type)].include?(k)
+                  ![primary_key, class_association.try(:foreign_key), class_association.try(:type), 'created_at', 'updated_at'].include?(k)
                 end
 
                 @object.send(association_name).build.tap do |a|
@@ -60,9 +63,9 @@ module RailsAdmin
             # clone has_and_belongs_to_many associtations
             @object.class.reflect_on_all_associations(:has_and_belongs_to_many).each do |class_association|
               association_name = class_association.name
-              association_name_ids = association_name.to_s.singularize.to_sym
+              method_ids = "#{association_name.to_s.singularize.to_sym}_ids"
 
-              @object.send(association_name_ids, @old_object.send(association_name_ids))
+              @object.send(method_ids, @old_object.send(method_ids))
             end
 
             @authorization_adapter && @authorization_adapter.attributes_for(:new, @abstract_model).each do |name, value|
