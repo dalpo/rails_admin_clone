@@ -15,58 +15,8 @@ module RailsAdmin
 
         register_instance_option :controller do
           Proc.new do
-
-            @old_object = @object
-            @object = @abstract_model.new
-
-            attributes = @old_object.attributes.select do |k,v|
-              ![@object.class.primary_key, 'created_at', 'updated_at'].include?(k)
-            end
-
-            # clone old_object
-            @object.assign_attributes attributes, without_protection: true
-
-            # clone has_one associations
-            @object.class.reflect_on_all_associations(:has_one).each do |class_association|
-              association_name = class_association.name
-              old_association = @old_object.send(association_name)
-
-              if old_association
-                primary_key = association_name.singularize.camelize.constantize.try(:primary_key) || 'id'
-
-                attributes = old_association.attributes.select do |k,v|
-                  ![primary_key, class_association.try(:foreign_key), class_association.try(:type), 'created_at', 'updated_at'].include?(k)
-                end
-
-                @object.send(:"build_#{association_name}").tap do |a|
-                  a.assign_attributes attributes, without_protection: true
-                end
-              end
-            end
-
-            # clone has_many associations
-            @object.class.reflect_on_all_associations(:has_many).each do |class_association|
-              association_name = class_association.name
-              primary_key = association_name.singularize.camelize.constantize.try(:primary_key) || 'id'
-
-              @old_object.send(association_name).each do |old_association|
-                attributes = old_association.attributes.select do |k,v|
-                  ![primary_key, class_association.try(:foreign_key), class_association.try(:type), 'created_at', 'updated_at'].include?(k)
-                end
-
-                @object.send(association_name).build.tap do |a|
-                  a.assign_attributes old_association.attributes, without_protection: true
-                end
-              end
-            end
-
-            # clone has_and_belongs_to_many associtations
-            @object.class.reflect_on_all_associations(:has_and_belongs_to_many).each do |class_association|
-              association_name = class_association.name
-              method_ids = "#{association_name.to_s.singularize.to_sym}_ids"
-
-              @object.send(method_ids, @old_object.send(method_ids))
-            end
+            model_cloner = RailsAdminClone::ModelCloner.new(@object)
+            @object = model_cloner.default_clone
 
             @authorization_adapter && @authorization_adapter.attributes_for(:new, @abstract_model).each do |name, value|
               @object.send("#{name}=", value)
