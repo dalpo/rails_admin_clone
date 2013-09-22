@@ -2,8 +2,8 @@ it:
   admin:
     actions:
       clone:
-        title: "Clona"
-        menu: "Clona %{model_label} '%{object_label}'"
+        title: "Clona %{model_label} '%{object_label}'"
+        menu: "Clona %{model_label}"
         breadcrumb: "Clona"
         link: "Clona"
         bulk_link: "Clona %{model_label_plural} selezionati"
