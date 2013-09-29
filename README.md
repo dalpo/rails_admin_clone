@@ -59,6 +59,7 @@ Submitting a Pull Request:
 [pr]: http://help.github.com/send-pull-requests/
 
 
+## License
 **This project rocks and uses MIT-LICENSE.**
 
 Copyright 2013 Andrea Dal Ponte
