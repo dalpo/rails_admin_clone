@@ -3,7 +3,7 @@ en:
     actions:
       clone:
         title: "Clone for %{model_label} '%{object_label}'"
-        menu: "Clone for %{model_label}"
+        menu: "Clone"
         breadcrumb: "Clone"
         link: "Clone"
         bulk_link: "Clone selected %{model_label_plural}"
