@@ -1,3 +1,5 @@
+require 'rails_admin/config/actions'
+require 'rails_admin/config/actions/base'
 
 module RailsAdmin
   module Config
@@ -15,8 +17,15 @@ module RailsAdmin
 
         register_instance_option :controller do
           Proc.new do
+            action_config = RailsAdmin::Config::Actions.find(:clone, {controller: self, abstract_model: @abstract_model, object: @object })
             model_cloner = RailsAdminClone::ModelCloner.new(@object)
-            @object = model_cloner.default_clone
+            custom_method = model_config.clone_config.custom_method
+
+            if custom_method.present?
+              @object = model_cloner.method_clone(custom_method)
+            else
+              @object = model_cloner.default_clone
+            end
 
             @authorization_adapter && @authorization_adapter.attributes_for(:new, @abstract_model).each do |name, value|
               @object.send("#{name}=", value)

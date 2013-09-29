@@ -9,39 +9,23 @@ module RailsAdminClone
       @original_model
     end
 
-    def default_clone(depth = nil)
-      @depth = depth
-
+    def default_clone
       new_object = self.clone_object(self.original_model)
       self.clone_recursively(self.original_model, new_object)
     end
 
     def method_clone(method)
+      self.original_model.send(method)
     end
 
   protected
 
-    def decrement_depth!
-      @depth-= 1 unless @depth.nil?
-    end
-
-    def depth
-      @depth
-    end
-
-    def go_depth?
-      self.depth.nil? || self.depth > 0
-    end
-
     def clone_recursively(old_object, new_object)
-      if go_depth?
+      new_object = clone_has_one(old_object, new_object)
+      new_object = clone_has_many(old_object, new_object)
+      new_object = clone_habtm(old_object, new_object)
 
-        new_object = clone_has_one(old_object, new_object)
-        new_object = clone_has_many(old_object, new_object)
-        new_object = clone_habtm(old_object, new_object)
-
-        new_object
-      end
+      new_object
     end
 
     # clone object without associations
