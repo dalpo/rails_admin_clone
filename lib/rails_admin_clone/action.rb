@@ -17,8 +17,7 @@ module RailsAdmin
 
         register_instance_option :controller do
           Proc.new do
-            action_config = RailsAdmin::Config::Actions.find(:clone, {controller: self, abstract_model: @abstract_model, object: @object })
-            model_cloner = RailsAdminClone::ModelCloner.new(@object)
+            model_cloner  = RailsAdminClone::ModelCloner.new(@object)
             custom_method = model_config.clone_config.custom_method
 
             if custom_method.present?
@@ -39,7 +38,6 @@ module RailsAdmin
               format.html { render @action.template_name }
               format.js   { render @action.template_name, :layout => false }
             end
-
           end
         end
 
