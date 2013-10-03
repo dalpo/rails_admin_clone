@@ -11,7 +11,9 @@ module RailsAdminClone
 
     def default_clone
       new_object = self.clone_object(self.original_model)
-      self.clone_recursively(self.original_model, new_object)
+      self.clone_recursively(self.original_model, new_object) rescue nil # stack level too deep?
+
+      new_object
     end
 
     def method_clone(method)
