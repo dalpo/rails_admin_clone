@@ -11,7 +11,13 @@ module RailsAdminClone
 
     def default_clone
       new_object = self.clone_object(self.original_model)
-      self.clone_recursively(self.original_model, new_object) rescue nil # stack level too deep?
+
+      self.clone_recursively!(self.original_model, new_object)
+      begin
+        self.clone_recursively!(self.original_model, new_object)
+      rescue Exception => e
+        Rails.logger.info "RailsAdminClone Exception on clone_recursively!:\n#{e}"
+      end
 
       new_object
     end
@@ -22,10 +28,11 @@ module RailsAdminClone
 
   protected
 
-    def clone_recursively(old_object, new_object)
+    def clone_recursively!(old_object, new_object)
       new_object = clone_has_one(old_object, new_object)
-      new_object = clone_has_many(old_object, new_object)
       new_object = clone_habtm(old_object, new_object)
+      new_object = clone_has_many(old_object, new_object)
+
 
       new_object
     end
@@ -57,7 +64,7 @@ module RailsAdminClone
 
           new_object.send(:"build_#{association_name}").tap do |new_association|
             new_association.assign_attributes attributes, without_protection: true
-            new_association = self.clone_recursively(old_association, new_association)
+            new_association = self.clone_recursively!(old_association, new_association)
           end
         end
       end
@@ -67,7 +74,10 @@ module RailsAdminClone
 
     # clone has_many associations
     def clone_has_many(old_object, new_object)
-      old_object.class.reflect_on_all_associations(:has_many).each do |class_association|
+      associations = old_object.class.reflect_on_all_associations(:has_many)
+        .select{|a| !a.options.keys.include?(:through)}
+
+      associations.each do |class_association|
         association_name = class_association.name
         # primary_key      = association_name.to_s.singularize.camelize.constantize.try(:primary_key) || 'id'
         primary_key = 'id'
@@ -79,7 +89,7 @@ module RailsAdminClone
 
           new_object.send(association_name).build.tap do |new_association|
             new_association.assign_attributes attributes, without_protection: true
-            new_association = self.clone_recursively(old_association, new_association)
+            new_association = self.clone_recursively!(old_association, new_association)
           end
         end
       end
@@ -89,11 +99,17 @@ module RailsAdminClone
 
     # clone has_and_belongs_to_many associtations
     def clone_habtm(old_object, new_object)
-      old_object.class.reflect_on_all_associations(:has_and_belongs_to_many).each do |class_association|
+      associations = old_object.class.reflect_on_all_associations.select do |a|
+        a.macro == :has_and_belongs_to_many || (a.macro == :has_many && a.options.keys.include?(:through))
+      end
+
+      associations.each do |class_association|
         association_name = class_association.name
         method_ids       = "#{association_name.to_s.singularize.to_sym}_ids"
 
-        new_object.send(method_ids, old_object.send(method_ids))
+        Rails.logger.info "**** association_name: #{association_name}"
+
+        new_object.send(:"#{method_ids}=", old_object.send(method_ids))
       end
 
       new_object
@@ -102,7 +118,6 @@ module RailsAdminClone
     def build_from(object)
       object.class.new
     end
-
   end
 end
 
