@@ -11,6 +11,7 @@ To enable rails_admin_clone, add the following to your `Gemfile`:
 gem 'rails_admin_clone'
 gem 'rails_admin'
 ```
+**Important:** `rails_admin_clone` must be defined before `rails_admin` to work correctly.
 
 
 Add in your `config/initializers/rails_admin.rb` initializer the configuration:
