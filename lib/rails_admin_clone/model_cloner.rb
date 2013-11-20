@@ -26,9 +26,9 @@ module RailsAdminClone
 
   protected
 
-    # def class_with_strong_parameters?(klass)
-    #   defined?(ActiveModel::ForbiddenAttributesProtection) && klass.include?(ActiveModel::ForbiddenAttributesProtection)
-    # end
+    def class_with_strong_parameters?(klass)
+      defined?(ActiveModel::ForbiddenAttributesProtection) && klass.include?(ActiveModel::ForbiddenAttributesProtection)
+    end
 
     def timestamp_columns
       %w(created_at created_on updated_at updated_on)
@@ -57,7 +57,7 @@ module RailsAdminClone
     end
 
     def assign_attributes_for(object, attributes)
-      if Rails.version < '4.0.0'
+      if class_with_strong_parameters?(object.class)
         object.assign_attributes attributes
       else
         object.assign_attributes attributes, without_protection: true
