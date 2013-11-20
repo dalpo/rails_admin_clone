@@ -44,7 +44,7 @@ module RailsAdminClone
         ![object.class.primary_key, 'created_at', 'updated_at'].include?(k)
       end
 
-      object.assign_attributes attributes, without_protection: true
+      object.assign_attributes attributes
       object
     end
 
@@ -63,7 +63,7 @@ module RailsAdminClone
           end
 
           new_object.send(:"build_#{association_name}").tap do |new_association|
-            new_association.assign_attributes attributes, without_protection: true
+            new_association.assign_attributes attributes
             new_association = self.clone_recursively!(old_association, new_association)
           end
         end
@@ -88,7 +88,7 @@ module RailsAdminClone
           end
 
           new_object.send(association_name).build.tap do |new_association|
-            new_association.assign_attributes attributes, without_protection: true
+            new_association.assign_attributes attributes
             new_association = self.clone_recursively!(old_association, new_association)
           end
         end
