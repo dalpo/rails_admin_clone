@@ -3,6 +3,7 @@
 Rails Admin plugin to clone existing records
 
 [![Gem Version](https://badge.fury.io/rb/rails_admin_clone.png)](http://badge.fury.io/rb/rails_admin_clone)
+[![Code Climate](https://codeclimate.com/github/dalpo/rails_admin_clone.png)](https://codeclimate.com/github/dalpo/rails_admin_clone)
 
 ## Installation
 
