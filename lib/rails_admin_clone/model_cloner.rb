@@ -64,6 +64,7 @@ module RailsAdminClone
       end
     end
 
+    # deep clone
     def clone_recursively!(old_object, new_object)
       new_object = clone_has_one  old_object, new_object
       new_object = clone_habtm    old_object, new_object
@@ -74,11 +75,7 @@ module RailsAdminClone
 
     # clone object without associations
     def clone_object(old_object)
-      object     = build_from(old_object)
-      # attributes = old_object.attributes.select do |k,v|
-      #   ![object.class.primary_key, 'created_at', 'updated_at'].include?(k)
-      # end
-
+      object = build_from(old_object)
       assign_attributes_for(object, get_model_attributes_from(old_object))
 
       object
@@ -87,16 +84,7 @@ module RailsAdminClone
     # clone has_one associations
     def clone_has_one(old_object, new_object)
       old_object.class.reflect_on_all_associations(:has_one).each do |association|
-        # association_name  = association.name
-        # association_class = association.class_name.constantize
-        # primary_key = association_class.primary_key
-        # sti_column  = association_class.inheritance_column
-
         if old_association = old_object.send(association.name)
-          # attributes = old_association.attributes.select do |k,v|
-          #   ![primary_key, sti_column, association.try(:foreign_key), association.try(:type), 'created_at', 'updated_at'].include?(k)
-          # end
-
           new_object.send(:"build_#{association.name}").tap do |new_association|
             assign_attributes_for(new_association, get_association_attributes_from(old_association, association))
             new_association = clone_recursively!(old_association, new_association)
@@ -113,16 +101,7 @@ module RailsAdminClone
         .select{|a| !a.options.keys.include?(:through)}
 
       associations.each do |association|
-        # association_name = association.name
-        # association_class = association.class_name.constantize
-        # primary_key = association_class.primary_key
-        # sti_column  = association_class.inheritance_column
-
         old_object.send(association.name).each do |old_association|
-          # attributes = old_association.attributes.select do |k,v|
-          #   ![primary_key, sti_column, association.try(:foreign_key), association.try(:type), 'created_at', 'updated_at'].include?(k)
-          # end
-
           new_object.send(association.name).build.tap do |new_association|
             assign_attributes_for(new_association, get_association_attributes_from(old_association, association))
             new_association = clone_recursively!(old_association, new_association)
