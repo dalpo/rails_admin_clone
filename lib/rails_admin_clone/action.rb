@@ -46,7 +46,7 @@ module RailsAdmin
         end
 
         register_instance_option :link_icon do
-          'icon-copy'
+          'icon-copy fa fa-files-o'
         end
       end
     end
