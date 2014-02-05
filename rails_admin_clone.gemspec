@@ -11,10 +11,10 @@ Gem::Specification.new do |s|
   s.email       = ["info@andreadalponte.com"]
   s.homepage    = "https://github.com/dalpo/rails_admin_clone"
   s.summary     = "Rails Admin plugin to clone existing records"
-  s.description = "Rails Admin plugin to clone existing records"
+  s.description = "Rails Admin custom action to clone an existing record to new one"
   s.license     = 'MIT'
 
-  s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
+  s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
 
   s.add_dependency "rails", ">= 3.2"
   s.add_dependency "rails_admin"
