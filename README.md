@@ -40,11 +40,30 @@ end
 You can specify a custom model method to clone objects with the following configuration:
 ```ruby
 RailsAdmin.config do |config|
-  config.model 'Team' do
+  config.model 'Post' do
     clone_config do
-      custom_method :your_model_method
+      custom_method :my_custom_clone_method
     end
   end
+end
+```
+
+Here an implementation example for a clone `custom_method`:
+```ruby
+require 'rails_admin_clone/model_cloner'
+
+class Post < ActiveRecord::Base
+
+  ...
+
+  def my_custom_clone_method
+    RailsAdminClone::ModelCloner.new(self).default_clone.tap do |post|
+      post.status = :draft
+      post.slug   = nil
+      post.title  = "Copy of #{self.title}"
+    end
+  end
+
 end
 ```
 
