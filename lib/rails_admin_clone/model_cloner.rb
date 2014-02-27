@@ -84,15 +84,22 @@ module RailsAdminClone
     # clone has_one associations
     def clone_has_one(old_object, new_object)
       old_object.class.reflect_on_all_associations(:has_one).each do |association|
-        if old_association = old_object.send(association.name)
-          new_object.send(:"build_#{association.name}").tap do |new_association|
-            assign_attributes_for(new_association, get_association_attributes_from(old_association, association))
-            new_association = clone_recursively!(old_association, new_association)
-          end
-        end
+        old_association_model = old_object.send(association.name)
+        build_has_one(new_object, association, old_association_model) if build_has_one?(old_object, association)
       end
 
       new_object
+    end
+
+    def build_has_one?(object, association)
+      object.send(association.name) && association.options[:through].blank?
+    end
+
+    def build_has_one(new_object, association, old_association_model)
+      new_object.send(:"build_#{association.name}").tap do |new_association|
+        assign_attributes_for(new_association, get_association_attributes_from(old_association_model, association))
+        new_association = clone_recursively!(old_association_model, new_association)
+      end
     end
 
     # clone has_many associations
