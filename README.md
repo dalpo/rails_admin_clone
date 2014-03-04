@@ -57,7 +57,7 @@ class Post < ActiveRecord::Base
   ...
 
   def my_custom_clone_method
-    RailsAdminClone::ModelCloner.new(self).default_clone.tap do |post|
+    self.dup.tap do |post|
       post.status = :draft
       post.slug   = nil
       post.title  = "Copy of #{self.title}"

@@ -124,11 +124,7 @@ module RailsAdminClone
 
     # clone has_and_belongs_to_many associtations
     def clone_habtm(old_object, new_object)
-      associations = old_object.class.reflect_on_all_associations.select do |a|
-        a.macro == :has_and_belongs_to_many || (a.macro == :has_many && a.options.keys.include?(:through))
-      end
-
-      associations.each do |association|
+      old_object.class.reflect_on_all_associations.select{|a| a.macro == :has_and_belongs_to_many}.each do |association|
         method_ids = "#{association.name.to_s.singularize.to_sym}_ids"
         new_object.send(:"#{method_ids}=", old_object.send(method_ids))
       end
