@@ -50,8 +50,6 @@ end
 
 Here an implementation example for a clone `custom_method`:
 ```ruby
-require 'rails_admin_clone/model_cloner'
-
 class Post < ActiveRecord::Base
 
   ...
@@ -66,6 +64,9 @@ class Post < ActiveRecord::Base
 
 end
 ```
+
+Note: for an easy way to clone ActiveRecord objects including their associations, take a look at [Amoeba Gem](https://github.com/rocksolidwebdesign/amoeba)
+
 
 ## Contributing
 Submitting a Pull Request:
@@ -84,7 +85,7 @@ Submitting a Pull Request:
 ## License
 **This project rocks and uses MIT-LICENSE.**
 
-Copyright 2013 Andrea Dal Ponte
+Copyright 2014 Andrea Dal Ponte
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
