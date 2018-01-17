@@ -40,7 +40,7 @@ end
 You can specify a custom model method to clone objects with the following configuration:
 ```ruby
 RailsAdmin.config do |config|
-  config.model 'Post' do
+  config.model Post do
     clone_config do
       custom_method :my_custom_clone_method
     end
