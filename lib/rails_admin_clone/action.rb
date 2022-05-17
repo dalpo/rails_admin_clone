@@ -46,7 +46,7 @@ module RailsAdmin
         end
 
         register_instance_option :link_icon do
-          'icon-copy fa fa-files-o'
+          'fa fa-copy'
         end
 
         register_instance_option :pjax? do
